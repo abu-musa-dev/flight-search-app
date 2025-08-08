@@ -1,82 +1,101 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { searchFlights } from "../services/amadeusAPI";
 
-const ACCESS_TOKEN = "beef5xZdkd6Jna0LDqdqJOIZB2bDy2Al"; // এখানেই সরাসরি Token বসানো হয়েছে
-
-const FlightSearch = () => {
+const FlightSearchForm = () => {
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [departureDate, setDepartureDate] = useState("");
-  const [passengers, setPassengers] = useState(1);
-  const [flights, setFlights] = useState([]);
+  const [adults, setAdults] = useState(1);
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const searchFlights = async () => {
+  const handleSearch = async () => {
+    setLoading(true);
+    setError("");
     try {
-      const response = await axios.get("https://test.api.amadeus.com/v2/shopping/flight-offers", {
-        headers: {
-          Authorization: `Bearer ${ACCESS_TOKEN}`,
-        },
-        params: {
-          originLocationCode: origin.toUpperCase(),
-          destinationLocationCode: destination.toUpperCase(),
-          departureDate,
-          adults: passengers,
-          max: 5,
-        },
-      });
-
-      setFlights(response.data.data || []);
-    } catch (error) {
-      console.error("❌ Flight search error:", error);
-      setFlights([]);
+      const data = await searchFlights(origin, destination, departureDate, adults);
+      setResults(data.data); // API response থেকে flight list
+    } catch (err) {
+      setError("Flight search failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flight-search">
-      <h2>✈️ Flight Search</h2>
-      <div>
+    <div className="max-w-md mx-auto mt-8 p-4 border rounded">
+      <h2 className="text-2xl font-bold mb-4 text-center">Flight Search</h2>
+
+      <div className="mb-3">
+        <label>From (e.g. DAC):</label>
         <input
           type="text"
-          placeholder="Origin (e.g., DAC)"
           value={origin}
-          onChange={(e) => setOrigin(e.target.value)}
+          onChange={(e) => setOrigin(e.target.value.toUpperCase())}
+          className="w-full border px-2 py-1"
+          placeholder="Origin Airport Code"
         />
+      </div>
+
+      <div className="mb-3">
+        <label>To (e.g. JFK):</label>
         <input
           type="text"
-          placeholder="Destination (e.g., JFK)"
           value={destination}
-          onChange={(e) => setDestination(e.target.value)}
+          onChange={(e) => setDestination(e.target.value.toUpperCase())}
+          className="w-full border px-2 py-1"
+          placeholder="Destination Airport Code"
         />
+      </div>
+
+      <div className="mb-3">
+        <label>Departure Date:</label>
         <input
           type="date"
           value={departureDate}
           onChange={(e) => setDepartureDate(e.target.value)}
+          className="w-full border px-2 py-1"
         />
-        <input
-          type="number"
-          value={passengers}
-          min={1}
-          onChange={(e) => setPassengers(e.target.value)}
-        />
-        <button onClick={searchFlights}>Search Flights</button>
       </div>
 
-      {flights.length > 0 ? (
-        <ul>
-          {flights.map((flight, index) => (
-            <li key={index}>
-              <strong>From:</strong> {flight.itineraries[0].segments[0].departure.iataCode} -{" "}
-              <strong>To:</strong> {flight.itineraries[0].segments[0].arrival.iataCode} <br />
-              <strong>Price:</strong> {flight.price.total} {flight.price.currency}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No flights found.</p>
-      )}
+      <div className="mb-3">
+        <label>Adults:</label>
+        <input
+          type="number"
+          value={adults}
+          onChange={(e) => setAdults(e.target.value)}
+          className="w-full border px-2 py-1"
+          min={1}
+        />
+      </div>
+
+      <button
+        onClick={handleSearch}
+        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        disabled={loading}
+      >
+        {loading ? "Searching..." : "Search Flights"}
+      </button>
+
+      {error && <p className="text-red-500 mt-2">{error}</p>}
+
+      {/* Results */}
+      <div className="mt-6">
+        {results.length > 0 ? (
+          results.map((flight, idx) => (
+            <div key={idx} className="border p-3 mb-3 rounded shadow-sm">
+              <p>🛫 {flight.itineraries[0].segments[0].departure.iataCode} → 🛬 {flight.itineraries[0].segments.slice(-1)[0].arrival.iataCode}</p>
+              <p>✈️ Airline: {flight.validatingAirlineCodes.join(", ")}</p>
+              <p>💰 Price: {flight.price.total} {flight.price.currency}</p>
+            </div>
+          ))
+        ) : (
+          !loading && <p className="text-gray-500 text-center">No flights found</p>
+        )}
+      </div>
     </div>
   );
 };
 
-export default FlightSearch;
+export default FlightSearchForm;
