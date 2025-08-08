@@ -1,4 +1,3 @@
-// src/pages/Home.jsx
 import { useState } from "react";
 import { searchFlights } from "../services/amadeusAPI";
 import FlightCard from "../components/FlightCard";

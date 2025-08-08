@@ -1,9 +1,9 @@
-function App() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-blue-100">
-      <h1 className="text-3xl font-bold text-blue-700">Welcome to Flight Search App</h1>
-    </div>
-  );
-}
+import React from "react";
+import Home from "./pages/Home";
+import FlightSearch from "./components/FlightSearch";
 
-export default App;
+
+export default function App() {
+  return <Home />;
+  <FlightSearch></FlightSearch>
+}
