@@ -1,15 +1,15 @@
 import axios from "axios";
 
-const CLIENT_ID = "pTk8lo13BSl3A6JxVuR9cwWv8BOQWTFS";    // আপনার Client ID
-const CLIENT_SECRET = "OSPxgRFXd4XzpOLq";                // আপনার Client Secret
+// Hardcoded API keys (NOT secure for production)
+const CLIENT_ID = "pTk8lo13BSl3A6JxVuR9cwWv8BOQWTFS";
+const CLIENT_SECRET = "OSPxgRFXd4XzpOLq";
 
 let accessToken = null;
-let tokenExpiry = null;  // Token expiry টাইম (মিলিসেকেন্ডে)
+let tokenExpiry = null;
 
 const getAccessToken = async () => {
   const now = Date.now();
 
-  // যদি Token আছে এবং মেয়াদ শেষ না হয়ে থাকে, তাহলে সেটাই রিটার্ন করো
   if (accessToken && tokenExpiry && now < tokenExpiry) {
     return accessToken;
   }
@@ -28,7 +28,7 @@ const getAccessToken = async () => {
     );
 
     accessToken = response.data.access_token;
-    tokenExpiry = now + response.data.expires_in * 1000; // expires_in সেকেন্ডে, তাই *1000
+    tokenExpiry = now + response.data.expires_in * 1000;
 
     return accessToken;
   } catch (error) {
@@ -37,26 +37,20 @@ const getAccessToken = async () => {
   }
 };
 
-// flight সার্চ ফাংশন: origin, destination, date, passengers নিবে
 export const searchFlights = async ({ origin, destination, date, passengers }) => {
   const token = await getAccessToken();
 
   try {
-    const response = await axios.get(
-      "https://test.api.amadeus.com/v2/shopping/flight-offers",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          originLocationCode: origin,
-          destinationLocationCode: destination,
-          departureDate: date,
-          adults: Number(passengers),
-          max: 5,
-        },
-      }
-    );
+    const response = await axios.get("https://test.api.amadeus.com/v2/shopping/flight-offers", {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        originLocationCode: origin,
+        destinationLocationCode: destination,
+        departureDate: date,
+        adults: passengers,
+        max: 5,
+      },
+    });
 
     return response.data.data;
   } catch (error) {

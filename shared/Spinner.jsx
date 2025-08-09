@@ -1,52 +1,57 @@
 import React from "react";
 
-const Spinner = () => (
-  <div className="flex justify-center items-center py-24 bg-transparent">
-    <div className="relative w-16 h-16">
-      {/* বড় রিং */}
-      <div
-        style={{
-          borderTopColor: "transparent",
-          borderWidth: "6px",           // থিক বর্ডার
-          borderStyle: "solid",
-          borderColor: "#dc2626",      // Tailwind red-700
-          borderRadius: "50%",
-          width: "64px",
-          height: "64px",
-          animation: "spin 1s linear infinite",
-          position: "absolute",
-          top: 0,
-          left: 0,
-        }}
-      ></div>
+const Spinner = ({ size = 50, thickness = 8, text = "", className = "" }) => {
+  const viewBox = 50;
+  const center = viewBox / 2;
+  const radius = 20;
 
-      {/* ছোট রিং */}
-      <div
-        style={{
-          borderBottomColor: "transparent",
-          borderWidth: "6px",           // থিক বর্ডার
-          borderStyle: "solid",
-          borderColor: "#b91c1c",      // Tailwind red-800
-          borderRadius: "50%",
-          width: "48px",
-          height: "48px",
-          animation: "spin 1s linear infinite",
-          animationDelay: "-0.5s",
-          position: "absolute",
-          top: "8px",
-          left: "8px",
-        }}
-      ></div>
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className={`inline-flex items-center ${className}`}
+    >
+      {/* Spinner icon */}
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${viewBox} ${viewBox}`}
+        className="animate-spin"
+        style={{ animationDuration: "0.5s" }} // Spin speed
+        aria-hidden="true"
+      >
+        {/* Background circle */}
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          stroke="currentColor"
+          strokeWidth={thickness}
+          strokeLinecap="round"
+          fill="none"
+          strokeOpacity="0.25"
+        />
+        {/* Moving arc */}
+        <path
+          d={`
+            M ${center} ${center - radius}
+            A ${radius} ${radius} 0 1 1 ${center - 0.01} ${center - radius}
+          `}
+          stroke="currentColor"
+          strokeWidth={thickness}
+          strokeLinecap="round"
+          fill="none"
+        />
+      </svg>
 
-      {/* স্পিন keyframes */}
-      <style>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+      {/* Optional text next to spinner */}
+      {text ? (
+        <span className="ml-3 text-sm font-medium text-gray-600">{text}</span>
+      ) : (
+        <span className="sr-only">Loading...</span>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 export default Spinner;
