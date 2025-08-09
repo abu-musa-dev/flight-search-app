@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { searchFlights } from "../services/amadeusAPI";
-
+import FlightCard from "./FlightCard";
 
 const FlightSearchForm = () => {
   const [origin, setOrigin] = useState("");
@@ -27,7 +27,7 @@ const FlightSearchForm = () => {
 
   return (
     <div className="max-w-md mx-auto mt-8 p-4 border rounded">
-      <h2 className="text-2xl font-bold mb-4 text-center">Flight Search</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center">Flight </h2>
 
       <div className="mb-3">
         <label>From (e.g. DAC):</label>
@@ -69,7 +69,7 @@ const FlightSearchForm = () => {
         <input
           type="number"
           value={adults}
-          onChange={(e) => setAdults(e.target.value)}
+          onChange={(e) => setAdults(Number(e.target.value))}
           className="w-full border px-2 py-1"
           min={1}
           required
@@ -89,16 +89,7 @@ const FlightSearchForm = () => {
       <div className="mt-6">
         {results.length > 0 ? (
           results.map((flight, idx) => (
-            <div key={idx} className="border p-3 mb-3 rounded shadow-sm">
-              <p>
-                🛫 {flight.itineraries[0].segments[0].departure.iataCode} → 🛬{" "}
-                {flight.itineraries[0].segments.slice(-1)[0].arrival.iataCode}
-              </p>
-              <p>✈️ Airline: {flight.validatingAirlineCodes.join(", ")}</p>
-              <p>
-                💰 Price: {flight.price.total} {flight.price.currency}
-              </p>
-            </div>
+            <FlightCard key={idx} flight={flight} />
           ))
         ) : (
           !loading && <p className="text-gray-500 text-center">No flights found</p>
