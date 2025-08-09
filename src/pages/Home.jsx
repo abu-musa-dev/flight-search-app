@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { searchFlights } from "../services/amadeusAPI";
 import FlightCard from "../components/FlightCard";
-import Spinner from "../../shared/Spinner";
+import Spinner from "../shared/Spinner";
 import Hero from "../sections/Hero";
 import { FaPlaneDeparture, FaPlaneArrival, FaUsers } from "react-icons/fa";
 import { motion } from "framer-motion";
