@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { searchFlights } from "../services/amadeusAPI";
-import HeroSection from "./HeroSection";
+
 
 const FlightSearchForm = () => {
   const [origin, setOrigin] = useState("");
@@ -27,7 +27,6 @@ const FlightSearchForm = () => {
 
   return (
     <div className="max-w-md mx-auto mt-8 p-4 border rounded">
-        <HeroSection></HeroSection>
       <h2 className="text-2xl font-bold mb-4 text-center">Flight Search</h2>
 
       <div className="mb-3">
