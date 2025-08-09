@@ -5,7 +5,6 @@ const CLIENT_SECRET = "beef5xZdkd6Jna0LDqdqJOIZB2bDy2Al";
 
 let accessToken = null;
 
-// Function to get access token
 const getAccessToken = async () => {
   if (accessToken) return accessToken;
 
@@ -18,43 +17,36 @@ const getAccessToken = async () => {
         client_secret: CLIENT_SECRET,
       }),
       {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
       }
     );
 
     accessToken = response.data.access_token;
     return accessToken;
   } catch (error) {
-    console.error("🔴 Access token error:", error.response?.data || error.message);
+    console.error("Access Token Error:", error.response?.data || error.message);
     throw error;
   }
 };
 
-// Function to search flights
 export const searchFlights = async (origin, destination, departureDate, adults) => {
-  try {
-    const token = await getAccessToken();
-    const response = await axios.get(
-      "https://test.api.amadeus.com/v2/shopping/flight-offers",
-      {
-        params: {
-          originLocationCode: origin,
-          destinationLocationCode: destination,
-          departureDate: departureDate,
-          adults: adults,
-          max: 10,
-        },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+  const token = await getAccessToken();
 
-    return response.data;
+  try {
+    const response = await axios.get("https://test.api.amadeus.com/v2/shopping/flight-offers", {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        originLocationCode: origin,
+        destinationLocationCode: destination,
+        departureDate,
+        adults,
+        max: 5,
+      },
+    });
+
+    return response.data.data; // এখানে মূল ফ্লাইট ডাটা আছে
   } catch (error) {
-    console.error("🔴 Flight search error: ", error.response?.data || error.message);
+    console.error("Flight Search Error:", error.response?.data || error.message);
     throw error;
   }
 };

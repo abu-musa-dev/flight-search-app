@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { searchFlights } from "../services/amadeusAPI";
+import HeroSection from "./HeroSection";
 
 const FlightSearchForm = () => {
   const [origin, setOrigin] = useState("");
@@ -13,11 +14,12 @@ const FlightSearchForm = () => {
   const handleSearch = async () => {
     setLoading(true);
     setError("");
+    setResults([]);
     try {
-      const data = await searchFlights(origin, destination, departureDate, adults);
-      setResults(data.data); // API response থেকে flight list
+      const flights = await searchFlights(origin, destination, departureDate, adults);
+      setResults(flights);
     } catch (err) {
-      setError("Flight search failed. Please try again.");
+      setError("Flight search failed. Please check your inputs and try again.");
     } finally {
       setLoading(false);
     }
@@ -25,6 +27,7 @@ const FlightSearchForm = () => {
 
   return (
     <div className="max-w-md mx-auto mt-8 p-4 border rounded">
+        <HeroSection></HeroSection>
       <h2 className="text-2xl font-bold mb-4 text-center">Flight Search</h2>
 
       <div className="mb-3">
@@ -35,6 +38,7 @@ const FlightSearchForm = () => {
           onChange={(e) => setOrigin(e.target.value.toUpperCase())}
           className="w-full border px-2 py-1"
           placeholder="Origin Airport Code"
+          required
         />
       </div>
 
@@ -46,6 +50,7 @@ const FlightSearchForm = () => {
           onChange={(e) => setDestination(e.target.value.toUpperCase())}
           className="w-full border px-2 py-1"
           placeholder="Destination Airport Code"
+          required
         />
       </div>
 
@@ -56,6 +61,7 @@ const FlightSearchForm = () => {
           value={departureDate}
           onChange={(e) => setDepartureDate(e.target.value)}
           className="w-full border px-2 py-1"
+          required
         />
       </div>
 
@@ -67,6 +73,7 @@ const FlightSearchForm = () => {
           onChange={(e) => setAdults(e.target.value)}
           className="w-full border px-2 py-1"
           min={1}
+          required
         />
       </div>
 
@@ -80,14 +87,18 @@ const FlightSearchForm = () => {
 
       {error && <p className="text-red-500 mt-2">{error}</p>}
 
-      {/* Results */}
       <div className="mt-6">
         {results.length > 0 ? (
           results.map((flight, idx) => (
             <div key={idx} className="border p-3 mb-3 rounded shadow-sm">
-              <p>🛫 {flight.itineraries[0].segments[0].departure.iataCode} → 🛬 {flight.itineraries[0].segments.slice(-1)[0].arrival.iataCode}</p>
+              <p>
+                🛫 {flight.itineraries[0].segments[0].departure.iataCode} → 🛬{" "}
+                {flight.itineraries[0].segments.slice(-1)[0].arrival.iataCode}
+              </p>
               <p>✈️ Airline: {flight.validatingAirlineCodes.join(", ")}</p>
-              <p>💰 Price: {flight.price.total} {flight.price.currency}</p>
+              <p>
+                💰 Price: {flight.price.total} {flight.price.currency}
+              </p>
             </div>
           ))
         ) : (
